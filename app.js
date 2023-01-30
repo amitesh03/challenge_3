@@ -3,12 +3,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
-
-const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
-const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
-const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
+const lodash = require("lodash");
+const homeStartingContent = "Hi,my name is Amitesh and I am an aspiring web developer. I am passionate about creating beautiful, functional and user-friendly websites that help businesses reach their full potential online.";
+const aboutContent = "Hi,my name is Amitesh and I am an aspiring web developer. I am passionate about creating beautiful, functional and user-friendly websites that help businesses reach their full potential online. I am driven by my desire to constantly learn and improve my skills in web development, and to create meaningful digital experiences that make a difference in people's lives.I have always been fascinated by technology and its potential to connect people, solve problems and make the world a better place. This is what inspired me to pursue a career in web development, and I am excited to be taking the first steps towards realizing my dream.I have a solid foundation in HTML, CSS, and JavaScript, and I am currently expanding my knowledge in other areas such as React, Node.js, and Responsive Web Design. I am also always open to learning new tools, technologies, and frameworks that can help me build better websites and provide better experiences for users.";
+const contactContent = "Contact me to build your website today!";
 
 const app = express();
+
+var posts = []
 
 app.set('view engine', 'ejs');
 
@@ -16,17 +18,40 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 
+app.get("/", function(req, res){
+  res.render("home", {hsc: homeStartingContent, postsArray: posts, lodash: lodash});
+});
 
+app.get("/posts/:blog", function(req, res){
+    const requested = req.params.blog;
+    posts.forEach(function(element){
+      if(lodash.lowerCase(element.blogTitle) === lodash.lowerCase(requested)){
+        res.render("post", {theTitle: element.blogTitle, theContent: element.blogPost,
+          lodash : lodash
+        });
+      }
+    });
+});
 
+app.get("/about", function(req, res){
+  res.render("about", ({ac: aboutContent}));
+});
 
+app.get("/contact", function(req, res){
+  res.render("contact", ({cc: contactContent}));
+});
 
+app.get("/compose", function(req, res){
+  res.render("compose");
+});
 
-
-
-
-
-
-
+app.post("/compose", function(req, res){
+  var post = {
+    blogTitle : req.body.blog_title, blogPost : req.body.blog_post
+  }
+  posts.push(post);
+  res.redirect("/");
+})
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
